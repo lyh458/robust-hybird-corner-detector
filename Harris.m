@@ -1,6 +1,6 @@
 %Source Code: http://blog.csdn.net/anymake_ren/article/details/21298807
 
-function [Corner_Location, corner_count, CRFmax] = Harris_corner_detect( gray_img )
+function [Corner_Location, CRFmax] = Harris( gray_img )
 %%%Prewitt Operator Corner Detection.m
 %%%时间优化--相邻像素用取差的方法求Harris角点
 %%
@@ -95,7 +95,7 @@ for i = boundary:nrow-boundary+1
                     && CRF(i,j) > CRF(i,j-1) && CRF(i,j) > CRF(i,j+1) ......
                     && CRF(i,j) > CRF(i+1,j-1) && CRF(i,j) > CRF(i+1,j)......
                     && CRF(i,j) > CRF(i+1,j+1)
-                count=count+1;%这个是角点，count加1
+%                 count=count+1;%这个是角点，count加1
 %                 CRF(i,j)
 %                 t*CRFmax
             else % 如果当前位置（i,j）不是角点，则在Corner(i,j)中删除对该候选角点的记录
@@ -106,7 +106,7 @@ for i = boundary:nrow-boundary+1
 end;
 % disp('角点个数');
 % disp(count)
-corner_count = count;
+% corner_count = count;
 
 k=0;
 Corner_Location=[];

@@ -45,13 +45,13 @@ end
 % ed = edge(bi, 'canny', 0.5);
 
 %% 调用各个角点检测算法求角点
-[Corner_harris, CRFmax] = Harris(img);
+[Corner_harris, CRFmax] = Harris_corner_detect(img);
 corner_count_harris = length(Corner_harris);
 
-[Corner_SUSAN] = SUSAN(img);
-corner_count_SUSAN = length(Corner_SUSAN);
+[Corner_SUSAN, corner_count_SUSAN] = SUSAN_corner_detect(img);
 
-Corner_RCSS = RCSS(img, []);
+Corner_RCSS_temp = RCSS(img, []);
+Corner_RCSS = [Corner_RCSS_temp(:,2),Corner_RCSS_temp(:,1)];
 corner_count_RCSS = length(Corner_RCSS);
 
 % Corner_harris_official = detectHarrisFeatures(gray_img);
