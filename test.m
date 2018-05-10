@@ -43,30 +43,30 @@ else
 end  
 
 % img = im2double(img);
-% [Corner_SUSAN,Corner] = SUSAN(img);
-% length(Corner_SUSAN)
+[Corner_SUSAN,Corner] = SUSAN(img);
+length(Corner_SUSAN)
 % [Corner_SUSAN_test] = SUSAN2_test(img,15,0.8);
-[Corner_Harris_test] = Harris_test(img);
-length(Corner_Harris_test)
-[Corner_Harris] = Harris(img);
-length(Corner_Harris)
+% [Corner_Harris_test] = Harris_test(img);
+% length(Corner_Harris_test)
+% [Corner_Harris] = Harris(img);
+% length(Corner_Harris)
 
 % function [ Corner_Location ] = SUSAN2_test(img,t,cnt)
 % t：模板中心像素的灰度值与模板内其他像素灰度值的差，即灰度相似度
 % c：若某个像素点的USAN值小于某一特定阈值，则该点被认为是初始角点，其中，g可以设定为USAN的最大面积的一半，此时c=0.5。值比较高时会提取出边缘。
 
-% figure('Name','SUSAN')
-% imshow(img),hold on
-% plot(Corner_SUSAN(:,2),Corner_SUSAN(:,1),'go')
+figure('Name','SUSAN')
+imshow(img),hold on
+plot(Corner_SUSAN(:,2),Corner_SUSAN(:,1),'go')
 
 % figure('Name','SUSAN_test')
 % imshow(img),hold on
 % plot(Corner_SUSAN_test(:,2),Corner_SUSAN_test(:,1),'go')
 % 
-figure('Name','harris_test')
-imshow(img),hold on
-plot(Corner_Harris_test(:,2),Corner_Harris_test(:,1),'go')
-
-figure('Name','harris')
-imshow(img),hold on
-plot(Corner_Harris(:,2),Corner_Harris(:,1),'go')
+% figure('Name','harris_test')
+% imshow(img),hold on
+% plot(Corner_Harris_test(:,2),Corner_Harris_test(:,1),'go')
+% 
+% figure('Name','harris')
+% imshow(img),hold on
+% plot(Corner_Harris(:,2),Corner_Harris(:,1),'go')

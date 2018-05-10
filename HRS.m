@@ -1,4 +1,4 @@
-function [ Corner_Location ] = HRS(gray_img, Corner_harris, Corner_RCSS, Corner_SUSAN, CRFmax)
+function [ Corner_Location ] = HRS(gray_img, Corner_harris, Corner_RCSS, Corner_SUSAN, CRF)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -91,8 +91,11 @@ for k = 1:length(LocR)
             Corner_RCSS_samewithintol(j,1)=Corner_RCSS_pure(LocR{k}(l),1);
             Corner_RCSS_samewithintol(j,2)=Corner_RCSS_pure(LocR{k}(l),2);
             % 匹配角点响应函数值归一化，作为位置权重
-            CRF1 = Corner_response_func(gray_img, Corner_harris_pure(k,1),Corner_harris_pure(k,2));
-            CRF2 = Corner_response_func(gray_img, Corner_RCSS_samewithintol(j,1),Corner_RCSS_samewithintol(j,2));
+%             CRF1 = Corner_response_func(gray_img, Corner_harris_pure(k,1),Corner_harris_pure(k,2));
+%             CRF2 = Corner_response_func(gray_img, Corner_RCSS_samewithintol(j,1),Corner_RCSS_samewithintol(j,2));
+            CRF1 = CRF(Corner_harris_pure(k,1),Corner_harris_pure(k,2));
+            CRF2 = CRF(Corner_RCSS_samewithintol(j,1),Corner_RCSS_samewithintol(j,2));
+            
             % 上面相当于不考虑B中可能会存在多个符合条件的元素，全部与对应的A加权，后面再消去相同的元素
 %             lambda_RCSS_samewithintol = [lambda_RCSS_samewithintol;D1(1,1),D1(2,2)];
 %             lambda_harris_pure = [lambda_harris_pure;D2(1,1),D2(2,2)];
