@@ -24,28 +24,17 @@
 % POSSIBILITY OF SUCH DAMAGE.
 % LINK: https://cn.mathworks.com/matlabcentral/fileexchange/30789-corner-detection-using-susan-operator
 
-function [Corner_Location] = SUSAN( img )
+function [Corner_Location,Corner] = SUSAN( img )
 %SUSAN Corner detection using SUSAN method.
 %   [R C] = SUSAN(IMG)	Rows and columns of corner points are returned.
 %	Edward @ THUEE, xjed09@gmail.com
-img = im2double(img);
+img = im2double(img); %% 将图像转换为双精度，即gray_value/255
 maskSz = [7 7];
 fun = @(img) susanFun(img);
 Corner = nlfilter(img,maskSz,fun); % 通用滑块邻域操作函数
-[r,c] = find(Corner); 
 
-% k=0;
-Corner_Location = [r,c];
-% corner_count = length(find(Corner));
-% for i=1:nrow
-%     for j=1:ncol
-%         if Corner(i,j)==1
-%             k=k+1;
-%             Corner_Location(k,:)=[j,i];
-%         end
-%     end
-% end
-
+Corner_Location = [];
+[Corner_Location(:,1),Corner_Location(:,2)] = find(Corner);
 
 end
 
@@ -64,6 +53,7 @@ end
 function res = susanFun(img)
 % SUSANFUN  Determine if the center of the image patch IMG
 %	is corner(res = 1) or not(res = 0)
+% img相当于模板了
 
 
 mask = [...
@@ -76,23 +66,28 @@ mask = [...
 	0 0 1 1 1 0 0];
 
 % uses 2 thresholds to distinguish corners from edges
-thGeo = (nnz(mask)-1)*.3; % nnz: Number of nonzero matrix elements.
+thGeo = (nnz(mask)-1)*.2; % nnz: Number of nonzero matrix elements. (nnz(mask)-1)可看作最大面积
 thGeo1 = (nnz(mask)-1)*.4;
 thGeo2 = (nnz(mask)-1)*.4;
-thT = .06;
-thT1 = .04;
+thT = .062; % 对应到的灰度值17.85
+thT1 = .04; % 对应到的灰度值10.2
 
 sz = size(img,1);
-usan = ones(sz)*img(round(sz/2),round(sz/2)); %
+usan = ones(sz)*img(round(sz/2),round(sz/2)); % 使得每一个矩阵元素都是模板中心元素的灰度值
+similar = abs(usan-img)<thT; % 逻辑矩阵
+similar = similar.*mask; % 逻辑矩阵
 
-similar = (abs(usan-img)<thT);
-similar = similar.*mask;
-res = sum(similar(:));
-if res < thGeo
+% global usan;
+% global similar1;
+% usan = ones(sz)*img(round(sz/2),round(sz/2)); % 使得每一个矩阵元素都是模板中心元素的灰度值
+% similar1 = abs(usan-img)<thT;
+% similar = similar1.*mask;
+
+res = sum(similar(:)); % 得出来的灰度值差的和，相当于sum(c(r,r0))
+if res < thGeo %% 当核心在区域边缘时，USAN区域面积是模板面积的一半
 	dark = nnz((img-usan<-thT1).*mask);
 	bright = nnz((img-usan>thT1).*mask);
-	res = min(dark,bright)<thGeo1 && max(dark,bright)>thGeo2;
-
+	res = min(dark,bright)<thGeo1 && max(dark,bright)>thGeo2; % 与运算
 else
 	res = 0;
 end

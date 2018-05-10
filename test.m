@@ -1,3 +1,6 @@
+% img = rgb2gray(im2double(imread('corner2.gif')));
+% img = im2double(imread('corner2.gif'));
+
 %% 清理数据
 close all;
 clear all;
@@ -10,11 +13,11 @@ clc;
 if filename == 0
     return;
 end
+newfilename = filename(1:end-4); % 用于动态保存文件名
 
 imgsrc = imread([pathname, filename]);
 % imgsrc = checkerboard;
 % [y, x, dim] = size(imgsrc);
-
 
 % 判断图像是否为灰度图像
 if (size(imgsrc,3) ~= 1)
@@ -37,25 +40,33 @@ if isa(img, 'uint8')
     img = img; 
 else
     img = im2uint8(img);
-end 
+end  
 
-corners = RCSS(img, []);
+% img = im2double(img);
+% [Corner_SUSAN,Corner] = SUSAN(img);
+% length(Corner_SUSAN)
+% [Corner_SUSAN_test] = SUSAN2_test(img,15,0.8);
+[Corner_Harris_test] = Harris_test(img);
+length(Corner_Harris_test)
+[Corner_Harris] = Harris(img);
+length(Corner_Harris)
 
-[Corner_harris, corner_count_harris, CRFmax] = Harris_corner_detect( img);
+% function [ Corner_Location ] = SUSAN2_test(img,t,cnt)
+% t：模板中心像素的灰度值与模板内其他像素灰度值的差，即灰度相似度
+% c：若某个像素点的USAN值小于某一特定阈值，则该点被认为是初始角点，其中，g可以设定为USAN的最大面积的一半，此时c=0.5。值比较高时会提取出边缘。
 
-Corner_harris_official = detectHarrisFeatures(img);
+% figure('Name','SUSAN')
+% imshow(img),hold on
+% plot(Corner_SUSAN(:,2),Corner_SUSAN(:,1),'go')
 
-[Corner_SUSAN, corner_count_SUSAN] = SUSAN_corner_detect( img);
+% figure('Name','SUSAN_test')
+% imshow(img),hold on
+% plot(Corner_SUSAN_test(:,2),Corner_SUSAN_test(:,1),'go')
+% 
+figure('Name','harris_test')
+imshow(img),hold on
+plot(Corner_Harris_test(:,2),Corner_Harris_test(:,1),'go')
 
-Corner_RCSS_temp = RCSS(img, []);
-Corner_RCSS = [Corner_RCSS_temp(:,2),Corner_RCSS_temp(:,1)];
-corner_count_RCSS = length(Corner_RCSS);
-
-
-
-
-imshow(img);
-hold on;
-scatter(corners(:, 1), corners(:, 2), 'MarkerEdgeColor',[0 1 0]);
-
-
+figure('Name','harris')
+imshow(img),hold on
+plot(Corner_Harris(:,2),Corner_Harris(:,1),'go')

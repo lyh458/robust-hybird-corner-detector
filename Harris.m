@@ -4,19 +4,19 @@ function [Corner_Location, CRFmax] = Harris( gray_img )
 %%%Prewitt Operator Corner Detection.m
 %%%时间优化--相邻像素用取差的方法求Harris角点
 %%
-Image = im2uint8(gray_img);
+img = im2uint8(gray_img);
 
 dx = [-1 0 1;-1 0 1;-1 0 1];  %dx：横向Prewitt差分模版
-Ix2 = filter2(dx,Image).^2;
-Iy2 = filter2(dx',Image).^2;
-Ixy = filter2(dx,Image).*filter2(dx',Image);
+Ix2 = filter2(dx,img).^2;
+Iy2 = filter2(dx',img).^2;
+Ixy = filter2(dx,img).*filter2(dx',img);
 
 %生成 9*9高斯窗口。窗口越大，探测到的角点越少。
 h= fspecial('gaussian',9,2);
 A = filter2(h,Ix2);       % 用高斯窗口差分Ix2得到A
 B = filter2(h,Iy2);
 C = filter2(h,Ixy);
-[nrow,ncol] = size(Image);
+[nrow,ncol] = size(img);
 Corner = zeros(nrow,ncol); %zeros用来产生一个全零矩阵，故矩阵Corner用来保存候选角点位置,初值全零，值为1的点是角点
 
 %参数t:点(i,j)八邻域的“相似度”参数，只有中心点与邻域其他八个点的像素值之差在
@@ -32,28 +32,28 @@ boundary=2;
 for i=boundary:nrow-boundary+1
     for j=boundary:ncol-boundary+1
         nlike=0; %相似点个数
-        if Image(i-1,j-1)>Image(i,j)-t && Image(i-1,j-1)<Image(i,j)+t
+        if img(i-1,j-1)>img(i,j)-t && img(i-1,j-1)<img(i,j)+t
             nlike=nlike+1;
         end
-        if Image(i-1,j)>Image(i,j)-t && Image(i-1,j)<Image(i,j)+t
+        if img(i-1,j)>img(i,j)-t && img(i-1,j)<img(i,j)+t
             nlike=nlike+1;
         end
-        if Image(i-1,j+1)>Image(i,j)-t && Image(i-1,j+1)<Image(i,j)+t
+        if img(i-1,j+1)>img(i,j)-t && img(i-1,j+1)<img(i,j)+t
             nlike=nlike+1;
         end
-        if Image(i,j-1)>Image(i,j)-t && Image(i,j-1)<Image(i,j)+t
+        if img(i,j-1)>img(i,j)-t && img(i,j-1)<img(i,j)+t
             nlike=nlike+1;
         end
-        if Image(i,j+1)>Image(i,j)-t && Image(i,j+1)<Image(i,j)+t
+        if img(i,j+1)>img(i,j)-t && img(i,j+1)<img(i,j)+t
             nlike=nlike+1;
         end
-        if Image(i+1,j-1)>Image(i,j)-t && Image(i+1,j-1)<Image(i,j)+t
+        if img(i+1,j-1)>img(i,j)-t && img(i+1,j-1)<img(i,j)+t
             nlike=nlike+1;
         end
-        if Image(i+1,j)>Image(i,j)-t && Image(i+1,j)<Image(i,j)+t
+        if img(i+1,j)>img(i,j)-t && img(i+1,j)<img(i,j)+t
             nlike=nlike+1;
         end
-        if Image(i+1,j+1)>Image(i,j)-t && Image(i+1,j+1)<Image(i,j)+t
+        if img(i+1,j+1)>img(i,j)-t && img(i+1,j+1)<img(i,j)+t
             nlike=nlike+1;
         end
         if nlike>=2 && nlike<=6
@@ -81,7 +81,6 @@ for i = boundary:nrow-boundary+1
     end;
 end;
 % CRFmax
-count = 0;       % 用来记录角点的个数
 t=0.01; 
 CRF_threshold = t*CRFmax;
 % CRF是正直且很大的时候是角点，CRFR是正直且很小是平坦区域，那么怎么界定很大和很小？
@@ -111,14 +110,7 @@ end;
 k=0;
 Corner_Location=[];
 % 矩阵里面，m是行数，图像的H方向，n是列数，图像的W方向,实际对应坐标时则是x=n，y=m.
-for i=1:nrow
-    for j=1:ncol
-        if Corner(i,j)==1
-            k=k+1;
-            Corner_Location(k,:)=[i,j];
-        end
-    end
-end
+[Corner_Location(:,1),Corner_Location(:,2)]=find(Corner==1);
 
 % %去除密集角点，显示平均值
 % k=0;

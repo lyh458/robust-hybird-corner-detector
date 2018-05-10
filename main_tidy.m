@@ -45,7 +45,10 @@ end
 % ed = edge(bi, 'canny', 0.5);
 
 %% 调用各个角点检测算法求角点
-[Corner_harris, CRFmax] = Harris(img);
+[Corner_harris, CRFmax] = Harris_test(img);
+
+% Corner_harris = detectHarrisFeatures(gray_img);
+% Matlab official Harris detector
 corner_count_harris = length(Corner_harris);
 
 [Corner_SUSAN] = SUSAN(img);
@@ -54,7 +57,14 @@ corner_count_SUSAN = length(Corner_SUSAN);
 Corner_RCSS = RCSS(img, []);
 corner_count_RCSS = length(Corner_RCSS);
 
-% Corner_harris_official = detectHarrisFeatures(gray_img);
+global Corner_harris_pure;
+global Corner_RCSS_pure;
+
+global Corner_harris_samewithintol;
+global Corner_RCSS_samewithintol;
+
+global Corner_harris_diff;
+global Corner_RCSS_diff;
 
 Corner_HRS = HRS(img, Corner_harris, Corner_RCSS, Corner_SUSAN, CRFmax);
 corner_count_HRS = length(Corner_HRS);
@@ -88,6 +98,7 @@ saveas(gcf,['.\experiments\',newfilename,'_harris.eps'],'psc2');
 
 %% SUNSAN1角点检测并在原图像显示角点
 % subplot(3,2,2);
+figure('name','SUSAN corner');
 imshow(imgsrc);%原图
 hold on;
 % toc(t1)
