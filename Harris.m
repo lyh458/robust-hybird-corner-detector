@@ -81,7 +81,7 @@ for i = boundary:nrow-boundary+1
     end;
 end;
 % CRFmax
-t=0.01; 
+t=0.0001; 
 CRF_threshold = t*CRFmax;
 % CRF是正直且很大的时候是角点，CRFR是正直且很小是平坦区域，那么怎么界定很大和很小？
 % 这就是t的作用，设置t如果比较大些，可以起到宁可错杀一千不可放过一个的效果
