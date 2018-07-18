@@ -1,16 +1,16 @@
 % Copyright (c) 2011, Wiggin
 % All rights reserved.
-% 
+%
 % Redistribution and use in source and binary forms, with or without
 % modification, are permitted provided that the following conditions are
 % met:
-% 
+%
 %     * Redistributions of source code must retain the above copyright
 %       notice, this list of conditions and the following disclaimer.
 %     * Redistributions in binary form must reproduce the above copyright
 %       notice, this list of conditions and the following disclaimer in
 %       the documentation and/or other materials provided with the distribution
-% 
+%
 % THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 % AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 % IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -42,12 +42,12 @@ end
 % %SUSAN Corner detection using SUSAN method.
 % %   [R C] = SUSAN(IMG)	Rows and columns of corner points are returned.
 % %	Edward @ THUEE, xjed09@gmail.com
-% 
+%
 % maskSz = [7 7];
 % fun = @(img) susanFun(img);
 % map = nlfilter(img,maskSz,fun);
 % [r c] = find(map);
-% 
+%
 % end
 
 function res = susanFun(img)
@@ -57,18 +57,18 @@ function res = susanFun(img)
 
 
 mask = [...
-	0 0 1 1 1 0 0
-	0 1 1 1 1 1 0
-	1 1 1 1 1 1 1
-	1 1 1 1 1 1 1
-	1 1 1 1 1 1 1
-	0 1 1 1 1 1 0
-	0 0 1 1 1 0 0];
+    0 0 1 1 1 0 0
+    0 1 1 1 1 1 0
+    1 1 1 1 1 1 1
+    1 1 1 1 1 1 1
+    1 1 1 1 1 1 1
+    0 1 1 1 1 1 0
+    0 0 1 1 1 0 0];
 
 % uses 2 thresholds to distinguish corners from edges
 thGeo = (nnz(mask)-1)*.2; % nnz: Number of nonzero matrix elements. (nnz(mask)-1)可看作最大面积
-thGeo1 = (nnz(mask)-1)*.4;
-thGeo2 = (nnz(mask)-1)*.4;
+thGeo1 = (nnz(mask)-1)*.7;
+thGeo2 = (nnz(mask)-1)*.7;
 thT = .062; % 对应到的灰度值17.85
 thT1 = .04; % 对应到的灰度值10.2
 
@@ -85,11 +85,12 @@ similar = similar.*mask; % 逻辑矩阵
 
 res = sum(similar(:)); % 得出来的灰度值差的和，相当于sum(c(r,r0))
 if res < thGeo %% 当核心在区域边缘时，USAN区域面积是模板面积的一半
-	dark = nnz((img-usan<-thT1).*mask);
-	bright = nnz((img-usan>thT1).*mask);
-	res = min(dark,bright)<thGeo1 && max(dark,bright)>thGeo2; % 与运算
+    % 	dark = nnz((img-usan<-thT1).*mask);
+    % 	bright = nnz((img-usan>thT1).*mask);
+    % 	res = min(dark,bright)<thGeo1 && max(dark,bright)>thGeo2; % 与运算
+    res = 1;
 else
-	res = 0;
+    res = 0;
 end
 
 end

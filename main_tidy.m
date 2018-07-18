@@ -1,3 +1,6 @@
+%% This is the main file after tidying of the project
+% Author: Yihui Li
+% Email: liyihui.ing@qq.com
 %% 清理数据
 close all;
 clear all;

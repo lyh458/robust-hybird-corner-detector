@@ -1,6 +1,6 @@
 %Source Code: http://blog.csdn.net/anymake_ren/article/details/21298807
 
-function [Corner_Location] = Harris( gray_img )
+function [Corner_Location, CRF] = Harris( gray_img )
 %%%Prewitt Operator Corner Detection.m
 %%%时间优化--相邻像素用取差的方法求Harris角点
 %%

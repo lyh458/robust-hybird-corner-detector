@@ -21,7 +21,6 @@ Corner_RCSS_pure = [];
 
 [C_harris,IA_harris]=uniquetol(Corner_harris, tol, 'ByRows', true, 'OutputAllIndices', true, 'DataScale', DS);
 for m = 1:length(IA_harris)
-    M_temp = [];
     if(length(IA_harris{m})==1)
         Corner_harris_pure(m,1) = Corner_harris(IA_harris{m},1);
         Corner_harris_pure(m,2) = Corner_harris(IA_harris{m},2);
@@ -34,7 +33,6 @@ end
 [C_RCSS,IA_RCSS]=uniquetol(Corner_RCSS, tol, 'ByRows', true, 'OutputAllIndices', true, 'DataScale', DS);
 
 for m = 1:length(IA_RCSS)
-     M_temp = [];
     W2 = [];
     l = length(IA_RCSS{m});
     loc_mat = [];
@@ -170,7 +168,6 @@ end
 tol2 = 6;
 [C_final,IA_final]=uniquetol(Corner_temp2, tol2, 'ByRows', true, 'OutputAllIndices', true, 'DataScale', DS);
 for m = 1:length(IA_final)
-    M_temp = [];
     W2 = [];
     l = length(IA_final{m});
     loc_mat = [];

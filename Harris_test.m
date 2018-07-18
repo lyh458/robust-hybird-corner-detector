@@ -12,7 +12,7 @@ Iy2 = filter2(dx',img).^2;
 Ixy = filter2(dx,img).*filter2(dx',img);
 
 %生成 9*9高斯窗口。窗口越大，探测到的角点越少。
-h= fspecial('gaussian',9,2);
+h= fspecial('gaussian',5,1.5);
 A = filter2(h,Ix2);       % 用高斯窗口差分Ix2得到A
 B = filter2(h,Iy2);
 C = filter2(h,Ixy);
