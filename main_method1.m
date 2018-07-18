@@ -48,7 +48,7 @@ end
 % ed = edge(bi, 'canny', 0.5);
 
 %% 调用各个角点检测算法求角点
-[Corner_harris,CRF] = Harris_test(img);
+[Corner_harris,CRF] = Harris(img);
 
 % Corner_harris = detectHarrisFeatures(gray_img);
 % Matlab official Harris detector
