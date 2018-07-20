@@ -13,7 +13,7 @@ clc;
 if filename == 0
     return;
 end
-newfilename = filename(1:end-4); % 用于动态保存文件名
+newfilename = filename(1:end-4); % 用于后面实验结果动态保存文件名
 
 imgsrc = imread([pathname, filename]);
 % imgsrc = checkerboard;
@@ -48,7 +48,7 @@ end
 % ed = edge(bi, 'canny', 0.5);
 
 %% 调用各个角点检测算法求角点
-[Corner_harris,CRF] = Harris(img);
+[Corner_harris,CRF] = Harris(img,0.0001);
 
 % Corner_harris = detectHarrisFeatures(gray_img);
 % Matlab official Harris detector

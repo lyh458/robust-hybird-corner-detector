@@ -1,6 +1,6 @@
 %Source Code: http://blog.csdn.net/anymake_ren/article/details/21298807
 
-function [Corner_Location,CRF] = Harris_test( gray_img )
+function [Corner_location,CRF] = Harris_test( gray_img, t_CRF )
 %%%Prewitt Operator Corner Detection.m
 %%%时间优化--相邻像素用取差的方法求Harris角点
 %%
@@ -37,8 +37,7 @@ for i = 1:nrow
     end;
 end;
 % CRFmax
-t=0.001;
-CRF_threshold = t*CRFmax;
+CRF_threshold = t_CRF*CRFmax;
 % CRF是正直且很大的时候是角点，CRFR是正直且很小是平坦区域，那么怎么界定很大和很小？
 % 这就是t的作用，设置t如果比较大些，可以起到宁可错杀一千不可放过一个的效果
 % 也有的通过选取一定阈值数量的点当作角点
@@ -58,10 +57,10 @@ end;
 % corner_count = count;
 
 k=0;
-Corner_Location=[];
+Corner_location=[];
 % 矩阵里面，m是行数，图像的H方向，n是列数，图像的W方向,实际对应坐标时则是x=n，y=m.
 
-[Corner_Location(:,1),Corner_Location(:,2)]=find(Corner==1);
+[Corner_location(:,1),Corner_location(:,2)]=find(Corner==1);
 
 end
 
