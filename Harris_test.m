@@ -1,6 +1,6 @@
 %Source Code: http://blog.csdn.net/anymake_ren/article/details/21298807
 
-function [Corner_location,CRF] = Harris_test( gray_img, t_CRF )
+function [Corner_location,marked_img,CRF] = Harris_test( gray_img, t_CRF )
 %%%Prewitt Operator Corner Detection.m
 %%%时间优化--相邻像素用取差的方法求Harris角点
 %%
@@ -61,6 +61,12 @@ Corner_location=[];
 % 矩阵里面，m是行数，图像的H方向，n是列数，图像的W方向,实际对应坐标时则是x=n，y=m.
 
 [Corner_location(:,1),Corner_location(:,2)]=find(Corner==1);
+
+img=gray_img;
+for i=1:length(Corner_location)
+    img=mark(img,Corner_location(i,1),Corner_location(i,2),5);
+end
+marked_img=img;
 
 end
 

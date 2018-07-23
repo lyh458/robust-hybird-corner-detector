@@ -48,7 +48,7 @@ end
 % ed = edge(bi, 'canny', 0.5);
 
 %% 调用各个角点检测算法求角点
-[Corner_harris,CRF] = Harris(img,0.0001);
+[Corner_harris,Harris_marked_img,CRF] = Harris(img,0.0001);
 
 % Corner_harris = detectHarrisFeatures(gray_img);
 % Matlab official Harris detector
@@ -57,8 +57,62 @@ corner_count_harris = length(Corner_harris);
 % [Corner_SUSAN] = SUSAN(img);
 % corner_count_SUSAN = length(Corner_SUSAN);
 
-Corner_RCSS = RCSS(img, []);
+Corner_RCSS = RCSS(img,[]);
+%   Inputs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   inputImage
+% 	width
+% 	height
+% 	edParam1
+% 	edParam2
+% 	edParam3
+% 	edParam4
+% 	lowThr
+% 	highThr
+% 	lineFitThr
+% 	maxLineLen
+% 	angleThr
+% 	gradMagThresh
+% 	TJuncs
+
 corner_count_RCSS = length(Corner_RCSS);
+
+[Corner_CSS,CSS_marked_img] = CSS(img,[],175);
+%       Syntax :    
+%       [cout,marked_img]=CSS(I,C,T_angle,sig,H,L,Endpiont,Gap_size)
+%
+%       Input :
+%       I -  the input image, it could be gray, color or binary image. If I is
+%           empty([]), input image can be get from a open file dialog box.
+%       C -  denotes the minimum ratio of major axis to minor axis of an ellipse, 
+%           whose vertex could be detected as a corner by proposed detector.  
+%           The default value is 1.5.
+%       T_angle -  denotes the maximum obtuse angle that a corner can have when 
+%           it is detected as a true corner, default value is 162.
+%       Sig -  denotes the standard deviation of the Gaussian filter when
+%           computeing curvature. The default sig is 3.
+%       H,L -  high and low threshold of Canny edge detector. The default value
+%           is 0.35 and 0.
+%       Endpoint -  a flag to control whether add the end points of a curve
+%           as corner, 1 means Yes and 0 means No. The default value is 1.
+%       Gap_size -  a paremeter use to fill the gaps in the contours, the gap
+%           not more than gap_size were filled in this stage. The default 
+%           Gap_size is 1 pixels.
+%
+%       Output :
+%       cout -  a position pair list of detected corners in the input image.
+%       marked_image -  image with detected corner marked.
+%
+%       Examples
+%       -------
+%       I = imread('alumgrns.tif');
+%       cout = corner(I,[],[],[],0.2);
+%
+%       [cout, marked_image] = corner;
+%
+%       cout = corner([],1.6,155);
+
+corner_count_CSS = length(Corner_CSS);
 
 % global Corner_harris_pure;
 % global Corner_RCSS_pure;
@@ -69,12 +123,12 @@ corner_count_RCSS = length(Corner_RCSS);
 % global Corner_harris_diff;
 % global Corner_RCSS_diff;
 
-Corner_HRS = HRS(img, Corner_harris, Corner_RCSS, Corner_SUSAN, CRF);
-corner_count_HRS = length(Corner_HRS);
+% Corner_HRS = HRS(img, Corner_harris, Corner_RCSS, Corner_SUSAN, CRF);
+% corner_count_HRS = length(Corner_HRS);
 
 set(gcf,'color','white','paperpositionmode','auto');
 
-%% Harris_unofficial角点检测并在原图像显示角点
+%% Harris角点检测并在原图像显示角点
 figure('Name','harris corner')
 % subplot(3,2,1);
 imshow(imgsrc);%原图
@@ -84,7 +138,7 @@ disp('Harris角点个数_unofficial');
 disp(corner_count_harris);
 %所有角点显示
 % plot(Corner_harris(:,2),Corner_harris(:,1),'g.');
-%% 显示坐标
+% 显示坐标
 % str1=[repmat('  X:',length(Corner_harris),1) num2str(Corner_harris(:, 2)) repmat(', Y:',length(Corner_harris),1) num2str(Corner_harris(:, 1))];
 plot(Corner_harris(:, 2), Corner_harris(:, 1), 'go');
 saveas(gcf,['.\experiments\',newfilename,'_harris.eps'],'psc2');
@@ -99,18 +153,6 @@ saveas(gcf,['.\experiments\',newfilename,'_harris.eps'],'psc2');
 % hold on;
 % plot(Corner_harris_diff(:,2),Corner_harris_diff(:,1),'g.');
 
-%% SUNSAN1角点检测并在原图像显示角点
-% subplot(3,2,2);
-figure('name','SUSAN corner');
-imshow(imgsrc);%原图
-hold on;
-% toc(t1)
-disp('SUNSAN角点个数');
-disp(corner_count_SUSAN);
-%所有角点显示
-plot(Corner_SUSAN(:,2),Corner_SUSAN(:,1),'go');
-saveas(gcf,['.\experiments\',newfilename,'_SUSAN.eps'],'psc2');
-
 %% RCSS角点检测并在原图像显示角点
 figure('Name','RCSS corner')
 % subplot(3,2,2);
@@ -119,7 +161,7 @@ disp(corner_count_RCSS);
 imshow(imgsrc);
 hold on;
 % plot(Corner_RCSS(:, 2), Corner_RCSS(:, 1), 'g.');
-%% 显示坐标
+% 显示坐标
 % str2=[repmat('  X:',length(Corner_RCSS),1) num2str(Corner_RCSS(:, 2)) repmat(', Y:',length(Corner_RCSS),1) num2str(Corner_RCSS(:, 1))];
 plot(Corner_RCSS(:, 2), Corner_RCSS(:, 1), 'go');
 saveas(gcf,['.\experiments\',newfilename,'_RCSS.eps'],'psc2');
@@ -129,97 +171,77 @@ saveas(gcf,['.\experiments\',newfilename,'_RCSS.eps'],'psc2');
 %     plot(Corner_RCSS_diff_final(:,2),Corner_RCSS_diff_final(:,1),'ro');
 % end
 
-%% harris_official角点检测并在原图像显示角点
-% subplot(3,2,4);
-% % Corner_harris_official = detectHarrisFeatures(gray_img);
-% % Corner_harris_official = detectHarrisFeatures(gray_img,'MinQuality',0.1,'FilterSize',5,'ROI',[8,8,size(gray_img,2)-8,size(gray_img,1)-8]);
-% disp('Harris_official角点个数');
-% disp(length(Corner_harris_official));
-% imshow(imgsrc);
-% hold on;
-% plot(Corner_harris_official.Location(:, 1),Corner_harris_official.Location(:, 2),'g.');
-% plot(Corner_harris_official.selectStrongest(50));
-%% points = detectHarrisFeatures(I,Name,Value)
-% Name-Value Pair Arguments
-% Specify optional comma-separated pairs of Name,Value arguments. Name is the argument name and Value is the corresponding value. Name must appear inside single quotes (' '). You can specify several name and value pair arguments in any order as Name1,Value1,...,NameN,ValueN.
-%
-% Example: 'MinQuality','0.01','ROI', [50,150,100,200] specifies that the detector must use a 1% minimum accepted quality of corners within the designated region of interest. This region of interest is located at x=50, y=150. The ROI has a width of 100 pixels and a height of 200 pixels.
-% 'MinQuality' — Minimum accepted quality of corners
-% 0.01 (default)
-% Minimum accepted quality of corners, specified as the comma-separated pair consisting of 'MinQuality' and a scalar value in the range [0,1].
-%
-% The minimum accepted quality of corners represents a fraction of the maximum corner metric value in the image. Larger values can be used to remove erroneous corners.
-%
-% Example: 'MinQuality', 0.01
-%
-% Data Types: single | double | int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint64
-%
-% 'FilterSize' — Gaussian filter dimension
-% 5 (default)
-% Gaussian filter dimension, specified as the comma-separated pair consisting of 'FilterSize' and an odd integer value in the range [3, min(size(I))].
-%
-% The Gaussian filter smooths the gradient of the input image.
-%
-% The function uses the FilterSize value to calculate the filter's dimensions, FilterSize-by-FilterSize. It also defines the standard deviation of the Gaussian filter as FilterSize/3.
-%
-% Example: 'FilterSize', 5
-%
-% Data Types: single | double | int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint64
-%
-% 'ROI' — Rectangular region
-% [1 1 size(I,2) size(I,1)] (default) | vector
-% Rectangular region for corner detection, specified as a comma-separated pair consisting of 'ROI' and a vector of the format [x y width height]. The first two integer values [x y] represent the location of the upper-left corner of the region of interest. The last two integer values represent the width and height.
-%
-% Example: 'ROI', [50,150,100,200]
-
-%% Eigenvalue Algorithm角点检测并在原图像显示角点
-% subplot(3,2,5);
-% Corner_MiniEigen = detectMinEigenFeatures(gray_img);
-% % Corner_harris_official = detectMiniEigen(gray_img,'MinQuality',0.1,'FilterSize',5,'ROI',[8,8,size(gray_img,2)-8,size(gray_img,1)-8]);
-% disp('MinEigen角点个数');
-% disp(length(Corner_MiniEigen));
-% imshow(imgsrc);
-% hold on;
-% plot(Corner_MiniEigen.Location(:, 1),Corner_MiniEigen.Location(:, 2),'g.');
-% plot(Corner_MiniEigen.selectStrongest(50));
-
-%% 显示边缘图像
-% subplot(3,2,4);
-% imshow(ed);%Matlab自带边缘检测
-
-
-%% 计算
-figure('Name','HRS corner')
-% subplot(3,2,3);
-imshow(imgsrc);
-disp('HRS角点个数');
-disp(corner_count_HRS);
+%% CSS角点检测并在原图像显示角点
+figure('Name','CSS corner')
+% subplot(3,2,1);
+imshow(imgsrc);%原图
 hold on;
-%% 显示坐标
-% str3=[repmat('  X:',length(Corner_final),1) num2str(Corner_final(:, 2)) repmat(', Y:',length(Corner_final),1) num2str(Corner_final(:, 1))];
-plot(Corner_HRS(:,2),Corner_HRS(:,1),'go');
-% text(Corner_final(:, 2),Corner_final(:, 1),cellstr(str3),'FontSize',5);
-saveas(gcf,['.\experiments\',newfilename,'_HRS.eps'],'psc2');
+% toc(t1)
+disp('CSS角点个数');
+disp(corner_count_CSS);
+%所有角点显示
+% plot(Corner_harris(:,2),Corner_harris(:,1),'g.');
+% 显示坐标
+% str1=[repmat('  X:',length(Corner_harris),1) num2str(Corner_harris(:, 2)) repmat(', Y:',length(Corner_harris),1) num2str(Corner_harris(:, 1))];
+plot(Corner_CSS(:, 2), Corner_CSS(:, 1), 'go');
+saveas(gcf,['.\experiments\',newfilename,'_CSS.eps'],'psc2');
 
-%% 
-% figure('Name','test')
-% % subplot(3,2,4);
-% imshow(imgsrc);%原图
-% hold on;
-% plot(Corner_diff_temp(:,2),Corner_diff_temp(:,1),'g.');
-% plot(Corner_diff_final(:,2),Corner_diff_final(:,1),'ro');
+%% Corner match
+img_append = appendimages(CSS_marked_img,Harris_marked_img);
+figure('Position', [0 0 size(img_append,2) size(img_append,1)]);
+%figure(3);
+colormap('gray');
+imagesc(img_append);
+hold on;
 
+% Euclidean distance match and show
+[Corner_matched_CSS,Corner_matched_Harris]=Corner_match_ED(Corner_CSS,Corner_harris);
 
-% plot(Corner_final(:,2),Corner_final(:,1),'g.');
-% for k = 1:length(ia1)
-%     %     M_RCSS2harris=[Corner_RCSS(ia1{k},1),Corner_RCSS(ia1{k},2)];
-%     plot(Corner_RCSS(ia1{k},1),Corner_RCSS(ia1{k},2),'g.');
+row = size(CSS_marked_img,1);
+for i = 1: length(Corner_matched_CSS)
+        line([Corner_matched_CSS(i,2) Corner_matched_Harris(i,2)+row], ...
+            [Corner_matched_CSS(i,1) Corner_matched_Harris(i,1)], 'Color', 'g');
+end
+
+% SVD match and show
+% UU = Corner_match(gray_img,gray_img,Corner_harris,Corner_CSS);
+% row = size(Harris_marked_img,1);
+% for i = 1: size(UU,1)
+%     if UU(i,1)>0
+%         line([Corner_harris(UU(i,1),2) Corner_CSS(UU(i,2),2)+row], ...
+%             [Corner_harris(UU(i,1),1) Corner_CSS(UU(i,2),1)], 'Color', 'g');
+%     end
 % end
-% 找出Harris在RCSS角点中的相同部分；
-% [C2,ia12] = ismembertol(Corner_RCSS,Corner_harris,tol,'ByRows',true,'OutputAllIndices',true,'DataScale',DS);
-% for k = 1:length(ia2)
-%     M_harris2RCSS=[Corner_harris(ia2{k},1),Corner_harris(ia2{k},2)];
-% end
+
+%% leak detection
+% we define Self-confident Level for Harris and CSS corners.
+% Self-confident Level for Harri corners.
+
+% mean CRF of matched corner 
+CRF_matched_Harris = []; % CRF of each matched Harris corner
+for i = 1:length(Corner_matched_Harris)
+    CRF_matched_Harris_temp = CRF(Corner_matched_Harris(i,1),Corner_matched_Harris(i,2));
+    CRF_matched_Harris = [CRF_matched_Harris,CRF_matched_Harris_temp];
+end
+
+CRF_mean = mean(CRF_matched_Harris); % mean CRF of matched Harris corner
+
+Corner_harris_diff = setdiff(Corner_harris, Corner_matched_Harris, 'rows'); % Corners except matched in Harris corner
+
+SCL_Harris_diff = []; % Self-confident Level of Corner_harris_diff
+for i = 1:length(Corner_harris_diff)
+    SCL_Harris_temp = CRF(Corner_harris_diff(i,1),Corner_harris_diff(i,2))/CRF_mean;
+    SCL_Harris_diff = [SCL_Harris_diff,SCL_Harris_temp];
+end
+Corner_Harris_leak_index = find(SCL_Harris_diff>=0.5); % if the Self-confident Level of Corner_harris_diff is larger than the mean, then this point is a corner
+
+if isempty(Corner_Harris_leak_index)
+    Corner_Harris_leak_index = [];
+else
+    Corner_Harris_leak = Corner_harris_diff(Corner_Harris_leak_index,:);
+end
+
+% Self-confident Level for CSS corners.
 
 %% localization Error
 

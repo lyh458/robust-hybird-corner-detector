@@ -1,6 +1,6 @@
 %Source Code: http://blog.csdn.net/anymake_ren/article/details/21298807
 
-function [Corner_location, CRF] = Harris( gray_img,t_CRF)
+function [Corner_location,marked_img,CRF] = Harris( gray_img,t_CRF)
 %% input
 % gray_img: a gray image 
 % t_CRF: the threshold of CRF of Harris detector
@@ -145,5 +145,10 @@ Corner_location=[];
 %     end;
 % end;
 
+img=gray_img;
+for i=1:length(Corner_location)
+    img=mark(img,Corner_location(i,1),Corner_location(i,2),5);
+end
+marked_img=img;
 end
 
