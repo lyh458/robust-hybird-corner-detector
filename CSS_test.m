@@ -43,14 +43,14 @@ ori_im2 = ImageData2;
  %imshow(imgauss2,[]); title('Gaussian2 Filted Image');
  %figure(); 
  % imshow(rslt,[]); title('canny filter');
- [cout1,marked_img1] = CSS(ori_im1,[],[],[],0.2);
+ [cout1,marked_img1] = CSS(ori_im1,[],[],[],0.2,[],[],[]);
  size(cout1,1)
 % descriptor1= vl_siftdescriptor(ori_im1, cout1);
  figure(1);
 imshow(marked_img1);
 title('Detected corners 1');
 imwrite(marked_img1,'corner1.jpg');
-[cout2,marked_img2] = CSS(ori_im2,[],[],[],0.2);
+[cout2,marked_img2] = CSS(ori_im2,[],[],[],0.2,[],[],[]);
 % [cout2,marked_img2] = CSS(ori_im2);
  size(cout2,1)
  %cout2(1,2)
@@ -120,7 +120,7 @@ hold on;
  % end
 %end
 
-UU = Corner_match(ori_im1,ori_im2,cout1,cout2);
+UU = Corner_match_SVD(ori_im1,ori_im2,cout1,cout2);
 cols1 = size(marked_img1,1);
 for i = 1: size(UU,1)
    

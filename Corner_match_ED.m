@@ -11,7 +11,7 @@ Corner_match2=[];
 for i=1:length(Corner1)
     D = sqrt((Corner2(:,1)-Corner1(i,1)).^2+(Corner2(:,2)-Corner1(i,2)).^2);
     [minD,j] = min(D);
-    if minD < 3
+    if minD < 4
         Corner_match1 = [Corner_match1;Corner1(i,1),Corner1(i,2)];
         Corner_match2 = [Corner_match2;Corner2(j,1),Corner2(j,2)];
     end

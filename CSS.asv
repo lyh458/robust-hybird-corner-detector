@@ -259,18 +259,18 @@ for i=1:curve_num;
                     ang=curve_tangent(smoothed_curve(extremum(j-1):extremum(j+1),:),extremum(j)-extremum(j-1)+1);
                 end
                 angle_temp = [angle_temp;ang];
-                if (ang>T_angle && ang<(360-T_angle))
-                    flag(j)=0;
-                end
-%                 if ang<180
-%                     ang_temp = ang;
-%                 else
-%                     ang_temp = 360-ang;
-%                 end
-%                 if ang_temp>T_angle || ang>=360
+%                 if (ang>T_angle && ang<(360-T_angle))
 %                     flag(j)=0;
 %                 end
-%                 output=[j,T_angle,ang,flag(j)]
+                if ang<180
+                    ang_temp = ang;
+                else
+                    ang_temp = 360-ang;
+                end
+                if ang_temp>T_angle || 
+                    flag(j)=0;
+                end
+                output=[j,T_angle,ang,flag(j)]
             end
             
             if size(extremum,2)==0

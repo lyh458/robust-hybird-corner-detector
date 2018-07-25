@@ -77,7 +77,7 @@ Corner_RCSS = RCSS(img,[]);
 
 corner_count_RCSS = length(Corner_RCSS);
 
-[Corner_CSS,CSS_marked_img] = CSS(img,[],175);
+[Corner_CSS,CSS_marked_img,Angle] = CSS(img,[],175,[],[],[],1,[]);
 %       Syntax :    
 %       [cout,marked_img]=CSS(I,C,T_angle,sig,H,L,Endpiont,Gap_size)
 %
@@ -102,6 +102,7 @@ corner_count_RCSS = length(Corner_RCSS);
 %       Output :
 %       cout -  a position pair list of detected corners in the input image.
 %       marked_image -  image with detected corner marked.
+%       Angle - The angle of corner except end points
 %
 %       Examples
 %       -------
@@ -126,6 +127,124 @@ corner_count_CSS = length(Corner_CSS);
 % Corner_HRS = HRS(img, Corner_harris, Corner_RCSS, Corner_SUSAN, CRF);
 % corner_count_HRS = length(Corner_HRS);
 
+
+%% Corner match
+img_append = appendimages(CSS_marked_img,Harris_marked_img);
+figure('Position', [0 0 size(img_append,2) size(img_append,1)]);
+%figure(3);
+colormap('gray');
+imagesc(img_append);
+hold on;
+
+% Euclidean distance match and show
+[Corner_CSS_matched,Corner_Harris_matched]=Corner_match_ED(Corner_CSS,Corner_harris);
+
+row = size(CSS_marked_img,1);
+for i = 1: length(Corner_CSS_matched)
+        line([Corner_CSS_matched(i,2) Corner_Harris_matched(i,2)+row], ...
+            [Corner_CSS_matched(i,1) Corner_Harris_matched(i,1)], 'Color', 'g');
+end
+
+% SVD match and show
+% UU = Corner_match(gray_img,gray_img,Corner_harris,Corner_CSS);
+% row = size(Harris_marked_img,1);
+% for i = 1: size(UU,1)
+%     if UU(i,1)>0
+%         line([Corner_harris(UU(i,1),2) Corner_CSS(UU(i,2),2)+row], ...
+%             [Corner_harris(UU(i,1),1) Corner_CSS(UU(i,2),1)], 'Color', 'g');
+%     end
+% end
+
+%% leak detection
+% we define Self-confident Level for Harris and CSS corners.
+% Self-confident Level for Harri corners.
+
+% mean CRF of matched corner 
+CRF_matched_Harris = []; % CRF of each matched Harris corner
+for i = 1:length(Corner_Harris_matched)
+    CRF_matched_Harris_temp = CRF(Corner_Harris_matched(i,1),Corner_Harris_matched(i,2));
+    CRF_matched_Harris = [CRF_matched_Harris,CRF_matched_Harris_temp];
+end
+
+CRF_mean = mean(CRF_matched_Harris); % mean CRF of matched Harris corner
+CRF_min = min(CRF_matched_Harris);
+
+Corner_harris_diff = setdiff(Corner_harris, Corner_Harris_matched, 'rows'); % Corners except matched in Harris corner
+
+Corner_CSS_nonendpoints = Corner_CSS(1:length(Angle),:);
+Corner_CSS_endpoints = setdiff(Corner_CSS,Corner_CSS_nonendpoints,'rows');
+Corner_CSS_diff = setdiff(Corner_CSS_nonendpoints,Corner_CSS_matched,'rows'); % 除端点外的CSS中没有匹配上的点
+
+Corner_diff = [Corner_harris_diff;Corner_CSS_diff];
+
+SCL_diff = []; % Self-confident Level of Corner_harris_diff
+for i = 1:length(Corner_diff)
+    SCL_temp = CRF(Corner_diff(i,1),Corner_diff(i,2))/CRF_min;
+%     SCL_Harris_temp = CRF(Corner_harris_diff(i,1),Corner_harris_diff(i,2))/CRF_min;
+    SCL_diff = [SCL_diff,SCL_temp];
+end
+Corner_leak_index = find(SCL_diff>=1); % if the Self-confident Level of Corner_harris_diff is larger than the mean, then this point is a corner
+
+if isempty(Corner_leak_index)
+    Corner_leak_index = [];
+else
+    Corner_leak = Corner_diff(Corner_leak_index,:); % missed Harris corners 
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%单纯计算Harris_diff角点的SCL%%%%%%%%%%%%%%%%%%%%
+% % mean CRF of matched corner 
+% CRF_matched_Harris = []; % CRF of each matched Harris corner
+% for i = 1:length(Corner_Harris_matched)
+%     CRF_matched_Harris_temp = CRF(Corner_Harris_matched(i,1),Corner_Harris_matched(i,2));
+%     CRF_matched_Harris = [CRF_matched_Harris,CRF_matched_Harris_temp];
+% end
+% 
+% CRF_mean = mean(CRF_matched_Harris); % mean CRF of matched Harris corner
+% CRF_min = min(CRF_matched_Harris);
+% 
+% Corner_harris_diff = setdiff(Corner_harris, Corner_Harris_matched, 'rows'); % Corners except matched in Harris corner
+% 
+% Corner_CSS_nonendpoints = Corner_CSS(1:length(Angle),:);
+% Corner_CSS_endpoints = setdiff(Corner_CSS,Corner_CSS_nonendpoints,'rows');
+% Corner_CSS_diff = setdiff(Corner_CSS_nonendpoints,Corner_CSS_matched,'rows'); % 除端点外的CSS中没有匹配上的点
+% 
+% Corner_diff = [Corner_harris_diff;Corner_CSS_diff];
+% 
+% SCL_Harris_diff = []; % Self-confident Level of Corner_harris_diff
+% for i = 1:length(Corner_harris_diff)
+%     SCL_Harris_temp = CRF(Corner_harris_diff(i,1),Corner_harris_diff(i,2))/CRF_mean;
+% %     SCL_Harris_temp = CRF(Corner_harris_diff(i,1),Corner_harris_diff(i,2))/CRF_min;
+%     SCL_Harris_diff = [SCL_Harris_diff,SCL_Harris_temp];
+% end
+% Corner_Harris_leak_index = find(SCL_Harris_diff>=1); % if the Self-confident Level of Corner_harris_diff is larger than the mean, then this point is a corner
+% 
+% if isempty(Corner_Harris_leak_index)
+%     Corner_Harris_leak_index = [];
+% else
+%     Corner_Harris_leak = Corner_harris_diff(Corner_Harris_leak_index,:); % missed Harris corners 
+% end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%计算这个意义不大%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % Self-confident Level for CSS corners.
+% Corner_CSS_nonendpoints = Corner_CSS(1:length(Angle),:);
+% % Corner_CSS_endpoints = setdiff(Corner_CSS,Corner_CSS_nonendpoints,'rows');
+% Corner_CSS_endpoints = Corner_CSS((length(Angle)+1):corner_count_CSS,:);
+% 
+% Angle_CSS_matched = []; % note that not all matched corners are belong to non-endpoints, several matched corner may be endpoints.
+% Corner_CSS_index_matched = find(ismember(Corner_CSS_nonendpoints,Corner_CSS_matched,'rows')); % Index of Corner_CSS_matched in Corner_CSS_nonendpoints
+% Angle_CSS_matched = Angle(Corner_CSS_index_matched); % endpoints are removed
+% 
+% % Corner_CSS_diff = setdiff(Corner_CSS_nonendpoints,Corner_CSS_matched,'rows');
+% Corner_CSS_index_diff = find(~ismember(Corner_CSS_nonendpoints,Corner_CSS_matched,'rows'));
+% Angle_CSS_diff = Angle(Corner_CSS_index_diff); % 没有匹配上角点的角度（除端点外）
+% 
+% n_obtuse = length(find(Angle_CSS_matched>=180));
+% Angle_mean = (sum(Angle_CSS_matched)-180*n_obtuse)/length(Angle_CSS_matched); % consider angle>180
+% Angle_min = min(Angle_CSS_matched);
+% 
+% SCL_CSS_diff = Angle_CSS_diff/Angle_mean;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 set(gcf,'color','white','paperpositionmode','auto');
 
 %% Harris角点检测并在原图像显示角点
@@ -134,13 +253,15 @@ figure('Name','harris corner')
 imshow(imgsrc);%原图
 hold on;
 % toc(t1)
-disp('Harris角点个数_unofficial');
+disp('Harris角点个数');
 disp(corner_count_harris);
 %所有角点显示
 % plot(Corner_harris(:,2),Corner_harris(:,1),'g.');
 % 显示坐标
 % str1=[repmat('  X:',length(Corner_harris),1) num2str(Corner_harris(:, 2)) repmat(', Y:',length(Corner_harris),1) num2str(Corner_harris(:, 1))];
 plot(Corner_harris(:, 2), Corner_harris(:, 1), 'go');
+plot(Corner_Harris_matched(:, 2), Corner_Harris_matched(:, 1), 'bo');
+% plot(Corner_leak(:, 2), Corner_leak(:, 1), 'ro');
 saveas(gcf,['.\experiments\',newfilename,'_harris.eps'],'psc2');
 % text(Corner_harris(:, 2),Corner_harris(:, 1),cellstr(str1),'FontSize',5);
 
@@ -184,64 +305,11 @@ disp(corner_count_CSS);
 % 显示坐标
 % str1=[repmat('  X:',length(Corner_harris),1) num2str(Corner_harris(:, 2)) repmat(', Y:',length(Corner_harris),1) num2str(Corner_harris(:, 1))];
 plot(Corner_CSS(:, 2), Corner_CSS(:, 1), 'go');
+plot(Corner_CSS_matched(:, 2), Corner_CSS_matched(:, 1), 'bo');
+plot(Corner_leak(:, 2), Corner_leak(:, 1), 'ro');
 saveas(gcf,['.\experiments\',newfilename,'_CSS.eps'],'psc2');
 
-%% Corner match
-img_append = appendimages(CSS_marked_img,Harris_marked_img);
-figure('Position', [0 0 size(img_append,2) size(img_append,1)]);
-%figure(3);
-colormap('gray');
-imagesc(img_append);
-hold on;
 
-% Euclidean distance match and show
-[Corner_matched_CSS,Corner_matched_Harris]=Corner_match_ED(Corner_CSS,Corner_harris);
-
-row = size(CSS_marked_img,1);
-for i = 1: length(Corner_matched_CSS)
-        line([Corner_matched_CSS(i,2) Corner_matched_Harris(i,2)+row], ...
-            [Corner_matched_CSS(i,1) Corner_matched_Harris(i,1)], 'Color', 'g');
-end
-
-% SVD match and show
-% UU = Corner_match(gray_img,gray_img,Corner_harris,Corner_CSS);
-% row = size(Harris_marked_img,1);
-% for i = 1: size(UU,1)
-%     if UU(i,1)>0
-%         line([Corner_harris(UU(i,1),2) Corner_CSS(UU(i,2),2)+row], ...
-%             [Corner_harris(UU(i,1),1) Corner_CSS(UU(i,2),1)], 'Color', 'g');
-%     end
-% end
-
-%% leak detection
-% we define Self-confident Level for Harris and CSS corners.
-% Self-confident Level for Harri corners.
-
-% mean CRF of matched corner 
-CRF_matched_Harris = []; % CRF of each matched Harris corner
-for i = 1:length(Corner_matched_Harris)
-    CRF_matched_Harris_temp = CRF(Corner_matched_Harris(i,1),Corner_matched_Harris(i,2));
-    CRF_matched_Harris = [CRF_matched_Harris,CRF_matched_Harris_temp];
-end
-
-CRF_mean = mean(CRF_matched_Harris); % mean CRF of matched Harris corner
-
-Corner_harris_diff = setdiff(Corner_harris, Corner_matched_Harris, 'rows'); % Corners except matched in Harris corner
-
-SCL_Harris_diff = []; % Self-confident Level of Corner_harris_diff
-for i = 1:length(Corner_harris_diff)
-    SCL_Harris_temp = CRF(Corner_harris_diff(i,1),Corner_harris_diff(i,2))/CRF_mean;
-    SCL_Harris_diff = [SCL_Harris_diff,SCL_Harris_temp];
-end
-Corner_Harris_leak_index = find(SCL_Harris_diff>=0.5); % if the Self-confident Level of Corner_harris_diff is larger than the mean, then this point is a corner
-
-if isempty(Corner_Harris_leak_index)
-    Corner_Harris_leak_index = [];
-else
-    Corner_Harris_leak = Corner_harris_diff(Corner_Harris_leak_index,:);
-end
-
-% Self-confident Level for CSS corners.
 
 %% localization Error
 
