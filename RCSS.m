@@ -8,7 +8,7 @@
 %
 % RCSS code is implemented by Cihan Topal, and it is not open source. Run this build on a 64-bit Windows machine.
 
-function [Corner_Location] = RCSS(I, params)
+function Corner_location = RCSS(I, params)
 %   Inputs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   inputImage
@@ -53,6 +53,12 @@ for i = 1:size(res, 2)
         corners_temp(end + 1, :) = [res(2, i) res(3, i)];
     end
 end
-Corner_Location = [];
-Corner_Location = [corners_temp(:,2),corners_temp(:,1)];
+Corner_location = [];
+Corner_location = [corners_temp(:,2),corners_temp(:,1)];
+
+% img=I;
+% for i=1:length(Corner_location)
+%     img=mark(img,Corner_location(i,1),Corner_location(i,2),5);
+% end
+% marked_img=img;
 end

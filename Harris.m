@@ -2,7 +2,7 @@
 
 function [Corner_location,marked_img,CRF] = Harris( gray_img,t_CRF)
 %% input
-% gray_img: a gray image 
+% gray_img: a gray image
 % t_CRF: the threshold of CRF of Harris detector
 
 %% output
@@ -95,14 +95,10 @@ CRF_threshold = t_CRF*CRFmax;
 for i = boundary:nrow-boundary+1
     for j = boundary:ncol-boundary+1
         if Corner(i,j)==1  % 只关注候选点的八邻域(非极大值抑制，3*3窗口)
-            if CRF(i,j) > CRF_threshold && CRF(i,j) >CRF(i-1,j-1) ......%?????为什么要CRF(i,j) > t*CRFmax啊？求大神告知
-                    && CRF(i,j) > CRF(i-1,j) && CRF(i,j) > CRF(i-1,j+1) ......
-                    && CRF(i,j) > CRF(i,j-1) && CRF(i,j) > CRF(i,j+1) ......
-                    && CRF(i,j) > CRF(i+1,j-1) && CRF(i,j) > CRF(i+1,j)......
-                    && CRF(i,j) > CRF(i+1,j+1)
-%                 count=count+1;%这个是角点，count加1
-%                 CRF(i,j)
-%                 t*CRFmax
+            if CRF(i,j) > CRF_threshold &&  CRF(i,j)>max([max(CRF(i-1,j-1:j+1)) CRF(i,j-1) CRF(i,j+1) max(CRF(i+1,j-1:j+1))]);
+                %                 count=count+1;%这个是角点，count加1
+                %                 CRF(i,j)
+                %                 t*CRFmax
             else % 如果当前位置（i,j）不是角点，则在Corner(i,j)中删除对该候选角点的记录
                 Corner(i,j) = 0;
             end;
