@@ -80,9 +80,9 @@ Corner_RCSS = RCSS(img,[]);
 
 corner_count_RCSS = length(Corner_RCSS);
 
-%% CSS
-[Corner_CSS,CSS_marked_img,Angle] = ECSS(img,[],175,[],0.4,0,1,1);
-% [Corner_CSS,CSS_marked_img,Angle] = CSS(img,[],[],[],[],[],[],[]);
+%% ECSS
+[Corner_ECSS,ECSS_marked_img,Angle] = ECSS(img,[],175,[],0.4,0,1,1);
+% [Corner_ECSS,ECSS_marked_img,Angle] = ECSS(img,[],[],[],[],[],[],[]);
 %       Syntax :
 %       [cout,marked_img]=CSS(I,C,T_angle,sig,H,L,Endpiont,Gap_size)
 %
@@ -118,7 +118,7 @@ corner_count_RCSS = length(Corner_RCSS);
 %
 %       cout = corner([],1.6,155);
 
-corner_count_CSS = length(Corner_CSS);
+corner_count_ECSS = length(Corner_ECSS);
 
 % global Corner_harris_pure;
 % global Corner_RCSS_pure;
@@ -134,7 +134,7 @@ corner_count_CSS = length(Corner_CSS);
 
 %% Corner match
 % Euclidean distance match and show
-[Corner_matched,Corner_CSS_matched,Corner_Harris_matched]=Corner_match_ED(Corner_CSS,Corner_harris);
+[Corner_matched,Corner_ECSS_matched,Corner_Harris_matched]=Corner_match_ED(Corner_ECSS,Corner_harris);
 
 % SVD match and show
 % UU = Corner_match(gray_img,gray_img,Corner_harris,Corner_CSS);
@@ -164,9 +164,9 @@ if ~isempty(Corner_Harris_matched)
     
     Corner_harris_diff = setdiff(Corner_harris, Corner_Harris_matched, 'rows'); % Corners except matched in Harris corner
     
-    Corner_CSS_nonendpoints = Corner_CSS(1:length(Angle),:);
-    Corner_CSS_endpoints = setdiff(Corner_CSS,Corner_CSS_nonendpoints,'rows');
-    Corner_CSS_diff = setdiff(Corner_CSS_nonendpoints,Corner_CSS_matched,'rows'); % 除端点外的CSS中没有匹配上的点
+    Corner_CSS_nonendpoints = Corner_ECSS(1:length(Angle),:);
+    Corner_CSS_endpoints = setdiff(Corner_ECSS,Corner_CSS_nonendpoints,'rows');
+    Corner_CSS_diff = setdiff(Corner_CSS_nonendpoints,Corner_ECSS_matched,'rows'); % 除端点外的CSS中没有匹配上的点
     
     Corner_diff = [Corner_harris_diff;Corner_CSS_diff];
     
@@ -187,17 +187,17 @@ if ~isempty(Corner_Harris_matched)
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%CSS角点的SCL%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Self-confident Level for CSS corners.
-    Corner_CSS_nonendpoints = Corner_CSS(1:length(Angle),:);
+    Corner_CSS_nonendpoints = Corner_ECSS(1:length(Angle),:);
     % Corner_CSS_endpoints = setdiff(Corner_CSS,Corner_CSS_nonendpoints,'rows');
-    Corner_CSS_endpoints = Corner_CSS((length(Angle)+1):corner_count_CSS,:);
+    Corner_CSS_endpoints = Corner_ECSS((length(Angle)+1):corner_count_ECSS,:);
     
     Angle_CSS_matched = []; % note that not all matched corners are belong to non-endpoints, several matched corner may be endpoints.
-    Corner_CSS_index_matched = find(ismember(Corner_CSS_nonendpoints,Corner_CSS_matched,'rows')); % Index of Corner_CSS_matched in Corner_CSS_nonendpoints
+    Corner_CSS_index_matched = find(ismember(Corner_CSS_nonendpoints,Corner_ECSS_matched,'rows')); % Index of Corner_CSS_matched in Corner_CSS_nonendpoints
     Angle_CSS_matched = Angle(Corner_CSS_index_matched); % endpoints are removed
     
-    Corner_CSS_diff = setdiff(Corner_CSS_nonendpoints,Corner_CSS_matched,'rows');
+    Corner_CSS_diff = setdiff(Corner_CSS_nonendpoints,Corner_ECSS_matched,'rows');
     
-    Corner_CSS_index_diff = find(~ismember(Corner_CSS_nonendpoints,Corner_CSS_matched,'rows'));
+    Corner_CSS_index_diff = find(~ismember(Corner_CSS_nonendpoints,Corner_ECSS_matched,'rows'));
     
     Angle_CSS_diff = Angle(Corner_CSS_index_diff); % 没有匹配上角点的角度（除端点外）
     
@@ -234,85 +234,167 @@ if ~isempty(Corner_Harris_matched)
     Corner = [Corner_matched;Corner_leak;Corner_CSS_endpoints];
     
 else
-    Corner = Corner_CSS;
+    Corner = Corner_ECSS;
 end
 
 % set(gcf,'color','white','paperpositionmode','auto');
 set (gcf,'Position',[0,0,500,500]);
 %% 原显示方式
-  %% Harris角点检测并在原图像显示角点
+%   %% Harris角点检测并在原图像显示角点
+% figure('Name','harris corner')
+% % subplot(3,2,1);
+% % img_Harris=mark(imgsrc,Corner_harris(i,1),Corner_harris(i,2),5);
+% % imshow(img_Harris);
+% imshow(imgsrc,'border','tight');
+% axis image;
+% hold on;
+% % toc(t1)
+% disp('Harris角点个数');
+% disp(corner_count_harris);
+% plot(Corner_harris(:, 2), Corner_harris(:, 1), 'go');
+% % if ~isempty(Corner_Harris_matched)
+% %     plot(Corner_Harris_matched(:, 2), Corner_Harris_matched(:, 1), 'bo');
+% % end
+% % plot(Corner_leak(:, 2), Corner_leak(:, 1), 'ro');
+% saveas(gcf,['.\experiments\',newfilename,'_harris.eps'],'psc2');
+% saveas(gcf,['.\experiments\',newfilename,'_harris.png']);
+% % text(Corner_harris(:, 2),Corner_harris(:, 1),cellstr(str1),'FontSize',5);
+% 
+% % if(~isempty(Corner_harris_diff))
+% %     plot(Corner_harris_diff(:,2),Corner_harris_diff(:,1),'ro');
+% % end
+% 
+% % subplot(3,2,2);
+% % imshow(imgsrc);%原图
+% % hold on;
+% % plot(Corner_harris_diff(:,2),Corner_harris_diff(:,1),'g.');
+% 
+% 
+% %% RCSS角点检测并在原图像显示角点
+% figure('Name','RCSS corner')
+% % subplot(3,2,2);
+% disp('RCSS角点个数');
+% disp(corner_count_RCSS);
+% imshow(imgsrc,'border','tight');
+% axis image;
+% hold on;
+% % plot(Corner_RCSS(:, 2), Corner_RCSS(:, 1), 'g.');
+% % 显示坐标
+% % str2=[repmat('  X:',length(Corner_RCSS),1) num2str(Corner_RCSS(:, 2)) repmat(', Y:',length(Corner_RCSS),1) num2str(Corner_RCSS(:, 1))];
+% plot(Corner_RCSS(:, 2), Corner_RCSS(:, 1), 'go');
+% saveas(gcf,['.\experiments\',newfilename,'_RCSS.eps'],'psc2');
+% saveas(gcf,['.\experiments\',newfilename,'_RCSS.png']);
+% % text(Corner_RCSS(:, 2),Corner_RCSS(:, 1),cellstr(str2),'FontSize',5);
+% % plot(Corner_RCSS_diff(:, 2), Corner_RCSS_diff(:, 1), 'ro');
+% % if(~isempty(Corner_RCSS_diff_final))
+% %     plot(Corner_RCSS_diff_final(:,2),Corner_RCSS_diff_final(:,1),'ro');
+% % end
+% 
+% %% CSS角点检测并在原图像显示角点
+% figure('Name','CSS corner')
+% % subplot(3,2,1);
+% imshow(imgsrc,'border','tight');
+% axis image;
+% hold on;
+% % toc(t1)
+% disp('CSS角点个数');
+% disp(corner_count_CSS);
+% %所有角点显示
+% % plot(Corner_harris(:,2),Corner_harris(:,1),'g.');
+% % 显示坐标
+% % str1=[repmat('  X:',length(Corner_harris),1) num2str(Corner_harris(:, 2)) repmat(', Y:',length(Corner_harris),1) num2str(Corner_harris(:, 1))];
+% plot(Corner_CSS(:, 2), Corner_CSS(:, 1), 'go');
+% % if ~isempty(Corner_CSS_matched)
+% %     plot(Corner_CSS_matched(:, 2), Corner_CSS_matched(:, 1), 'bo');
+% % end
+% % plot(Corner_leak(:, 2), Corner_leak(:, 1), 'ro');
+% saveas(gcf,['.\experiments\',newfilename,'_CSS.eps'],'psc2');
+% saveas(gcf,['.\experiments\',newfilename,'_CSS.png']);
+% 
+% %% Corner matching show
+% img_append = appendimages(CSS_marked_img,Harris_marked_img);
+% % figure('Position', [0 0 size(img_append,2) size(img_append,1)]);
+% figure('Name','Corner matching');
+% %figure(3);
+% colormap('gray');
+% % imagesc(img_append);
+% imshow(img_append,'border','tight');
+% axis image;
+% hold on;
+% row = size(CSS_marked_img,1);
+% for i = 1: length(Corner_CSS_matched)
+%     line([Corner_CSS_matched(i,2) Corner_Harris_matched(i,2)+row], ...
+%         [Corner_CSS_matched(i,1) Corner_Harris_matched(i,1)], 'Color', 'g');
+% end
+% saveas(gcf,['.\experiments\',newfilename,'_corner_matching.eps'],'psc2');
+% saveas(gcf,['.\experiments\',newfilename,'_corner_matching.png']);
+% 
+% %% 最终角点检测并在原图像显示角点
+% figure('Name','Final corner')
+% % subplot(3,2,1);
+% imshow(imgsrc,'border','tight');
+% axis image;
+% % axis normal;
+% hold on;
+% % toc(t1)
+% disp('最终角点个数');
+% disp(length(Corner));
+% %所有角点显示
+% % plot(Corner_harris(:,2),Corner_harris(:,1),'g.');
+% % 显示坐标
+% % str1=[repmat('  X:',length(Corner_harris),1) num2str(Corner_harris(:, 2)) repmat(', Y:',length(Corner_harris),1) num2str(Corner_harris(:, 1))];
+% plot(Corner(:, 2), Corner(:, 1), 'go');
+% % if ~isempty(Corner_CSS_matched)
+% %     %     plot(Corner_CSS_matched(:, 2), Corner_CSS_matched(:, 1), 'bo');
+% %     plot(Corner_matched(:, 2), Corner_matched(:, 1), 'bo');
+% %     plot(Corner_leak(:, 2), Corner_leak(:, 1), 'ro');
+% % end
+% saveas(gcf,['.\experiments\',newfilename,'_final.eps'],'psc2');
+% saveas(gcf,['.\experiments\',newfilename,'_final.png']);
+
+%% 新显示方式，更新对比度
+%% Harris角点检测并在原图像显示角点
 figure('Name','harris corner')
-% subplot(3,2,1);
-% img_Harris=mark(imgsrc,Corner_harris(i,1),Corner_harris(i,2),5);
-% imshow(img_Harris);
-imshow(imgsrc,'border','tight');
-axis image;
-hold on;
-% toc(t1)
+Harris_marked_img = imgsrc;
+for i=1:length(Corner_harris)
+    Harris_marked_img = mark(Harris_marked_img,Corner_harris(i,1),Corner_harris(i,2),5);
+end
+imshow(Harris_marked_img);
+imwrite(Harris_marked_img,['.\experiments\',newfilename,'_Harris.png']);
 disp('Harris角点个数');
 disp(corner_count_harris);
-plot(Corner_harris(:, 2), Corner_harris(:, 1), 'go');
-% if ~isempty(Corner_Harris_matched)
-%     plot(Corner_Harris_matched(:, 2), Corner_Harris_matched(:, 1), 'bo');
-% end
-% plot(Corner_leak(:, 2), Corner_leak(:, 1), 'ro');
-saveas(gcf,['.\experiments\',newfilename,'_harris.eps'],'psc2');
-saveas(gcf,['.\experiments\',newfilename,'_harris.png']);
-% text(Corner_harris(:, 2),Corner_harris(:, 1),cellstr(str1),'FontSize',5);
-
-% if(~isempty(Corner_harris_diff))
-%     plot(Corner_harris_diff(:,2),Corner_harris_diff(:,1),'ro');
-% end
-
-% subplot(3,2,2);
-% imshow(imgsrc);%原图
-% hold on;
-% plot(Corner_harris_diff(:,2),Corner_harris_diff(:,1),'g.');
-
 
 %% RCSS角点检测并在原图像显示角点
 figure('Name','RCSS corner')
-% subplot(3,2,2);
+RCSS_marked_img = imgsrc;
+for i=1:length(Corner_RCSS)
+    RCSS_marked_img = mark(RCSS_marked_img,Corner_RCSS(i,1),Corner_RCSS(i,2),5);
+end
+imshow(RCSS_marked_img);
+imwrite(RCSS_marked_img,['.\experiments\',newfilename,'_RCSS.png']);
 disp('RCSS角点个数');
 disp(corner_count_RCSS);
-imshow(imgsrc,'border','tight');
-axis image;
-hold on;
-% plot(Corner_RCSS(:, 2), Corner_RCSS(:, 1), 'g.');
-% 显示坐标
-% str2=[repmat('  X:',length(Corner_RCSS),1) num2str(Corner_RCSS(:, 2)) repmat(', Y:',length(Corner_RCSS),1) num2str(Corner_RCSS(:, 1))];
-plot(Corner_RCSS(:, 2), Corner_RCSS(:, 1), 'go');
-saveas(gcf,['.\experiments\',newfilename,'_RCSS.eps'],'psc2');
-saveas(gcf,['.\experiments\',newfilename,'_RCSS.png']);
-% text(Corner_RCSS(:, 2),Corner_RCSS(:, 1),cellstr(str2),'FontSize',5);
-% plot(Corner_RCSS_diff(:, 2), Corner_RCSS_diff(:, 1), 'ro');
-% if(~isempty(Corner_RCSS_diff_final))
-%     plot(Corner_RCSS_diff_final(:,2),Corner_RCSS_diff_final(:,1),'ro');
-% end
 
-%% CSS角点检测并在原图像显示角点
-figure('Name','CSS corner')
-% subplot(3,2,1);
-imshow(imgsrc,'border','tight');
-axis image;
-hold on;
-% toc(t1)
-disp('CSS角点个数');
-disp(corner_count_CSS);
-%所有角点显示
-% plot(Corner_harris(:,2),Corner_harris(:,1),'g.');
-% 显示坐标
-% str1=[repmat('  X:',length(Corner_harris),1) num2str(Corner_harris(:, 2)) repmat(', Y:',length(Corner_harris),1) num2str(Corner_harris(:, 1))];
-plot(Corner_CSS(:, 2), Corner_CSS(:, 1), 'go');
-% if ~isempty(Corner_CSS_matched)
-%     plot(Corner_CSS_matched(:, 2), Corner_CSS_matched(:, 1), 'bo');
-% end
-% plot(Corner_leak(:, 2), Corner_leak(:, 1), 'ro');
-saveas(gcf,['.\experiments\',newfilename,'_CSS.eps'],'psc2');
-saveas(gcf,['.\experiments\',newfilename,'_CSS.png']);
+%% ECSS角点检测并在原图像显示角点
+figure('Name','ECSS corner')
+imshow(ECSS_marked_img);
+imwrite(ECSS_marked_img,['.\experiments\',newfilename,'_ECSS.png']);
+disp('ECSS角点个数');
+disp(corner_count_ECSS);
+
+%% 最终角点检测并在原图像显示角点
+figure('Name','Final corner')
+Final_marked_img = imgsrc;
+for i=1:length(Corner)
+    Final_marked_img = mark(Final_marked_img,Corner(i,1),Corner(i,2),5);
+end
+imshow(Final_marked_img);
+imwrite(Final_marked_img,['.\experiments\',newfilename,'_final.png']);
+disp('最终角点个数');
+disp(length(Corner));
 
 %% Corner matching show
-img_append = appendimages(CSS_marked_img,Harris_marked_img);
+img_append = appendimages(ECSS_marked_img,Harris_marked_img);
 % figure('Position', [0 0 size(img_append,2) size(img_append,1)]);
 figure('Name','Corner matching');
 %figure(3);
@@ -321,38 +403,13 @@ colormap('gray');
 imshow(img_append,'border','tight');
 axis image;
 hold on;
-row = size(CSS_marked_img,1);
-for i = 1: length(Corner_CSS_matched)
-    line([Corner_CSS_matched(i,2) Corner_Harris_matched(i,2)+row], ...
-        [Corner_CSS_matched(i,1) Corner_Harris_matched(i,1)], 'Color', 'g');
+row = size(ECSS_marked_img,1);
+for i = 1: length(Corner_ECSS_matched)
+    line([Corner_ECSS_matched(i,2) Corner_Harris_matched(i,2)+row], ...
+        [Corner_ECSS_matched(i,1) Corner_Harris_matched(i,1)], 'Color', 'g');
 end
 saveas(gcf,['.\experiments\',newfilename,'_corner_matching.eps'],'psc2');
 saveas(gcf,['.\experiments\',newfilename,'_corner_matching.png']);
-
-%% 最终角点检测并在原图像显示角点
-figure('Name','Final corner')
-% subplot(3,2,1);
-imshow(imgsrc,'border','tight');
-axis image;
-% axis normal;
-hold on;
-% toc(t1)
-disp('最终角点个数');
-disp(length(Corner));
-%所有角点显示
-% plot(Corner_harris(:,2),Corner_harris(:,1),'g.');
-% 显示坐标
-% str1=[repmat('  X:',length(Corner_harris),1) num2str(Corner_harris(:, 2)) repmat(', Y:',length(Corner_harris),1) num2str(Corner_harris(:, 1))];
-plot(Corner(:, 2), Corner(:, 1), 'go');
-% if ~isempty(Corner_CSS_matched)
-%     %     plot(Corner_CSS_matched(:, 2), Corner_CSS_matched(:, 1), 'bo');
-%     plot(Corner_matched(:, 2), Corner_matched(:, 1), 'bo');
-%     plot(Corner_leak(:, 2), Corner_leak(:, 1), 'ro');
-% end
-saveas(gcf,['.\experiments\',newfilename,'_final.eps'],'psc2');
-saveas(gcf,['.\experiments\',newfilename,'_final.png']);
-
-
 
 %% localization Error
 
