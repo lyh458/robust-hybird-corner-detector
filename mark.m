@@ -1,7 +1,7 @@
 function [img_mark]=mark(img,x,y,w)
 % Mark the detected corner in the image
 
-[M,N,C]=size(img);
+[M,N]=size(img);
 img_mark=img;
 
 if isa(img,'logical')

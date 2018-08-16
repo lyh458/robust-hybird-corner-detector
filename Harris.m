@@ -70,7 +70,7 @@ for i=boundary:nrow-boundary+1
 end;
 CRF = zeros(nrow,ncol);    % CRF用来保存角点响应函数值,初值全零
 CRFmax = 0;                % 图像中角点响应函数的最大值，作阈值之用
-m=0.05; %一般取值为0.04~0.06
+m=0.045; %一般取值为0.04~0.06
 % 计算CRF
 % 工程上常用CRF(i,j) =det(M)/trace(M)计算CRF，那么此时应该将下面第105行的
 % 比例系数k设置大一些，k=0.1对采集的这几幅图像来说是一个比较合理的经验值
@@ -114,33 +114,39 @@ Corner_location=[];
 % 矩阵里面，m是行数，图像的H方向，n是列数，图像的W方向,实际对应坐标时则是x=n，y=m.
 [Corner_location(:,1),Corner_location(:,2)]=find(Corner==1);
 
-% %去除密集角点，显示平均值
-% k=0;
-% for i=boundary:nrow-boundary+1
-%     for j=boundary:ncol-boundary+1
+%去除密集角点，显示平均值
+k=0;
+for i=boundary:nrow-boundary+1
+    for j=boundary:ncol-boundary+1
 %         column_ave=0;
 %         row_ave=0;
-%         m=0;
-%         if Corner(i,j)==1
-%             for x=i-3:i+3  %7*7邻域
-%                 for y=j-3:j+3
-%                     if Corner(x,y)==1
-%                         % 用算术平均数作为角点坐标，如果改用几何平均数求点的平均坐标，对角点的提取意义不大
+        m=0;
+        maxCRF = 0;
+        if Corner(i,j)==1
+            for x=i-3:i+3  %7*7邻域
+                for y=j-3:j+3
+                    if Corner(x,y)==1
+                        % 用算术平均数作为角点坐标，如果改用几何平均数求点的平均坐标，对角点的提取意义不大
 %                         row_ave=row_ave+x;
 %                         column_ave=column_ave+y;
-%                         m=m+1;
-%
-%                     end
-%                 end
-%             end
-%         end
-%         if m>0 %周围不止一个角点
-%             k=k+1;
-%             Corner_Location(k,:) = [column_ave/m,row_ave/m];
-%         end
-%     end;
-% end;
-
+                        m=m+1;
+                        if CRF(x,y)>maxCRF
+                            maxCRF = CRF(x,y);
+                            i_temp = x;
+                            j_temp = y;
+                        end
+                    end
+                end
+            end
+        end
+        if m>0 %周围不止一个角点
+            k=k+1;
+%             Corner_location(k,:) = [column_ave/m,row_ave/m];
+            Corner_location(k,:) = [i_temp,j_temp];
+        end
+    end;
+end;
+Corner_location = unique(Corner_location,'rows');
 img=gray_img;
 for i=1:length(Corner_location)
     img=mark(img,Corner_location(i,1),Corner_location(i,2),5);

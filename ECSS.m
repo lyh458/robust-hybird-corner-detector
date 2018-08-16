@@ -69,18 +69,18 @@ if size(I,3)==3
     I=rgb2gray(I); % Transform RGB image to a Gray one.
 end
 
-tic
+tic;
 BW=edge(I,'canny',[L,H]);  % Detect edges
-time_for_detecting_edge=toc
+time_for_detecting_edge=toc;
 
-tic
+tic;
 global curve;
 [curve,curve_start,curve_end,curve_mode,curve_num]=extract_curve(BW,Gap_size);  % Extract curves
-time_for_extracting_curve=toc
+time_for_extracting_curve=toc;
 
-tic
+tic;
 [cout,angle]=get_corner(curve,curve_start,curve_end,curve_mode,curve_num,BW,sig,Endpoint,C,T_angle); % Detect corners
-time_for_detecting_corner=toc
+time_for_detecting_corner=toc;
 
 img=I;
 for i=1:size(cout,1)
@@ -153,10 +153,10 @@ for i=1:cur_num
     
     BW_edge(curve{i}(:,1)+(curve{i}(:,2)-1)*L)=1;
 end
-figure(3)
-imshow(~BW_edge)
-title('Edge map')
-imwrite(~BW_edge,'edge.jpg');
+% figure(3)
+% imshow(~BW_edge)
+% title('Edge map')
+% imwrite(~BW_edge,'edge.jpg');
 
 
 function [cout,angle]=get_corner(curve,curve_start,curve_end,curve_mode,curve_num,BW,sig,Endpoint,C,T_angle)
