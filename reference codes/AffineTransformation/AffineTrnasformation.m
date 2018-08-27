@@ -349,7 +349,7 @@ if  gg~=2
                 case 0
                     th=th;
                 otherwise
-                    th=th*pi/180;;
+                    th=th*pi/180;
             end   
             k=1;
             TT=k*[cos(th) -sin(th); sin(th) cos(th)]*[a b; c d];

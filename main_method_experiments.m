@@ -38,23 +38,10 @@ TPR_harris = [];
 TPR_RCSS = [];
 TPR_ECSS = [];
 TPR_final = [];
-TP_harris = [];
-TP_RCSS = [];
-TP_ECSS = [];
-TP_final = [];
-FP_harris = [];
-FP_RCSS = [];
-FP_ECSS = [];
-FP_final = [];
 FPR_harris = [];
 FPR_RCSS = [];
 FPR_ECSS = [];
 FPR_final = [];
-Ground_truth_num = [];
-Corner_harris_num = [];
-Corner_RCSS_num = [];
-Corner_ECSS_num = [];
-Corner_final_num = [];
 if img_num > 0 %有满足条件的图像
     for j = 1:img_num %逐一读取图像
         file_name = img_path_list(j).name;% 图像名
@@ -301,7 +288,6 @@ if img_num > 0 %有满足条件的图像
             else
                 Corner = Corner_ECSS;
             end
-            corner_count_final = length(Corner);
             
             % set(gcf,'color','white','paperpositionmode','auto');
             set (gcf,'Position',[0,0,500,500]);
@@ -423,90 +409,86 @@ if img_num > 0 %有满足条件的图像
             % saveas(gcf,['.\experiments\',newfilename,'_final.png']);
             
             %% 新显示方式，更新对比度
-            %             % %% Harris角点检测并在原图像显示角点
-            %             figure('Name','harris corner')
-            %             %             Harris_marked_img = imgsrc;
-            %             %             for i=1:length(Corner_harris)
-            %             %                 Harris_marked_img = mark(Harris_marked_img,Corner_harris(i,1),Corner_harris(i,2),5);
-            %             %             end
-            %             imshow(Harris_marked_img_default);
-            %             disp('Harris角点个数');
-            %             disp(corner_count_harris);
-            %
-            %             % %% RCSS角点检测并在原图像显示角点
-            %             figure('Name','RCSS corner')
-            %             imshow(RCSS_marked_img);
-            %             disp('RCSS角点个数');
-            %             disp(corner_count_RCSS);
-            %
-            %             % %% ECSS角点检测并在原图像显示角点
-            %             figure('Name','ECSS corner')
-            %             imshow(ECSS_marked_img_default);
-            %             disp('ECSS角点个数');
-            %             disp(corner_count_ECSS);
-            %
-            %             % %% 最终角点检测并在原图像显示角点
-            %             figure('Name','Final corner')
-            %             imshow(Final_marked_img);
-            %             disp('最终角点个数');
-            %             disp(length(Corner));
-            %             save(['.\experiments\result',newfilename,'.mat'],'Corner_harris','Corner_ECSS','Corner_RCSS','Corner');
-                        %% Show matched corners of 'blocks.gif'
-                        if strcmp(file_name,'blocks.gif')
-                            % %% Corner matching show
-                            img_append = appendimages(ECSS_marked_img,Harris_marked_img);
-                            % figure('Position', [0 0 size(img_append,2) size(img_append,1)]);
-                            figure('Name','Corner matching');
-                            %figure(3);
-                            colormap('gray');
-                            % imagesc(img_append);
-                            imshow(img_append,'border','tight');
-                            axis image;
-                            hold on;
-                            row = size(ECSS_marked_img,1);
-                            for i = 1: length(Corner_ECSS_matched)
-                                line([Corner_ECSS_matched(i,2) Corner_Harris_matched(i,2)+row], ...
-                                    [Corner_ECSS_matched(i,1) Corner_Harris_matched(i,1)], 'Color', 'g');
-                            end
-                            % saveas(gcf,['.\experiments\',newfilename,'_corner_matching.eps'],'psc2');
-                            saveas(gcf,['.\experiments\result\',newfilename,'_corner_matching.png']);
-                        end
+%             % %% Harris角点检测并在原图像显示角点
+%             figure('Name','harris corner')
+%             %             Harris_marked_img = imgsrc;
+%             %             for i=1:length(Corner_harris)
+%             %                 Harris_marked_img = mark(Harris_marked_img,Corner_harris(i,1),Corner_harris(i,2),5);
+%             %             end
+%             imshow(Harris_marked_img_default);
+%             disp('Harris角点个数');
+%             disp(corner_count_harris);
+%             
+%             % %% RCSS角点检测并在原图像显示角点
+%             figure('Name','RCSS corner')
+%             imshow(RCSS_marked_img);
+%             disp('RCSS角点个数');
+%             disp(corner_count_RCSS);
+%             
+%             % %% ECSS角点检测并在原图像显示角点
+%             figure('Name','ECSS corner')
+%             imshow(ECSS_marked_img_default);
+%             disp('ECSS角点个数');
+%             disp(corner_count_ECSS);
+%             
+%             % %% 最终角点检测并在原图像显示角点
+%             figure('Name','Final corner')
+%             imshow(Final_marked_img);
+%             disp('最终角点个数');
+%             disp(length(Corner));
+%             save(['.\experiments\result',newfilename,'.mat'],'Corner_harris','Corner_ECSS','Corner_RCSS','Corner');
+%             %% Show matched corners of 'blocks.gif'
+%             if strcmp(file_name,'blocks.gif')
+%                 % %% Corner matching show
+%                 img_append = appendimages(ECSS_marked_img,Harris_marked_img);
+%                 % figure('Position', [0 0 size(img_append,2) size(img_append,1)]);
+%                 figure('Name','Corner matching');
+%                 %figure(3);
+%                 colormap('gray');
+%                 % imagesc(img_append);
+%                 imshow(img_append,'border','tight');
+%                 axis image;
+%                 hold on;
+%                 row = size(ECSS_marked_img,1);
+%                 for i = 1: length(Corner_ECSS_matched)
+%                     line([Corner_ECSS_matched(i,2) Corner_Harris_matched(i,2)+row], ...
+%                         [Corner_ECSS_matched(i,1) Corner_Harris_matched(i,1)], 'Color', 'g');
+%                 end
+%                 % saveas(gcf,['.\experiments\',newfilename,'_corner_matching.eps'],'psc2');
+%                 saveas(gcf,['.\experiments\',newfilename,'_corner_matching.png']);
+%             end
             %% Save images
             imwrite(Harris_marked_img_default,['.\experiments\result\',newfilename,'_Harris.png']);
-            %             save(['.\experiments\result\',newfilename,'_Harris.mat'],'Corner_harris_default');
+%             save(['.\experiments\result\',newfilename,'_Harris.mat'],'Corner_harris_default');
             
             imwrite(RCSS_marked_img,['.\experiments\result\',newfilename,'_RCSS.png']);
-            %             save(['.\experiments\result\',newfilename,'_RCSS.mat'],'Corner_RCSS');
+%             save(['.\experiments\result\',newfilename,'_RCSS.mat'],'Corner_RCSS');
             
             imwrite(ECSS_marked_img_default,['.\experiments\result\',newfilename,'_ECSS.png']);
-            %             save(['.\experiments\result\',newfilename,'_ECSS.mat'],'Corner_ECSS_default');
+%             save(['.\experiments\result\',newfilename,'_ECSS.mat'],'Corner_ECSS_default');
             
             imwrite(Final_marked_img,['.\experiments\result\',newfilename,'_final.png']);
-            %             save(['.\experiments\result\',newfilename,'_final.mat'],'Corner');
+%             save(['.\experiments\result\',newfilename,'_final.mat'],'Corner');
             %% Experiments
             % Import ground truth
             load(['.\experiments\ground truth\Location_',newfilename,'.mat']);
-            Ground_truth = [Location(:,2),Location(:,1)];
-            ground_truth_num = length(Ground_truth);
-            [tp_harris, tpr_harris, fp_harris, fpr_harris, acu_harris, le_harris] = TP_FP(Corner_harris, Ground_truth, imgsrc);
-            [tp_RCSS, tpr_RCSS, fp_RCSS, fpr_RCSS, acu_RCSS, le_RCSS] = TP_FP(Corner_RCSS, Ground_truth, imgsrc);
-            [tp_ECSS, tpr_ECSS, fp_ECSS, fpr_ECSS, acu_ECSS, le_ECSS] = TP_FP(Corner_ECSS, Ground_truth, imgsrc);
-            [tp_final, tpr_final, fp_final, fpr_final, acu_final, le_final] = TP_FP(Corner, Ground_truth, imgsrc);
+            Location_temp = [Location(:,2),Location(:,1)];
+            [tpr_harris, fpr_harris, acu_harris, le_harris] = TP_FP(Corner_harris, Location_temp, imgsrc);
+            [tpr_RCSS, fpr_RCSS, acu_RCSS, le_RCSS] = TP_FP(Corner_RCSS, Location_temp, imgsrc);
+            [tpr_ECSS, fpr_ECSS, acu_ECSS, le_ECSS] = TP_FP(Corner_ECSS, Location_temp, imgsrc);
+            [tpr_final, fpr_final, acu_final, le_final] = TP_FP(Corner, Location_temp, imgsrc);
             % Receiver Operating Characteristic
         end
         % 储存数据
         Image_name{j,1}=newfilename;
-        
         LE_harris = [LE_harris;le_harris];
         LE_RCSS = [LE_RCSS;le_RCSS];
         LE_ECSS = [LE_ECSS;le_ECSS];
         LE_final = [LE_final;le_final];
-        
         ACU_harris = [ACU_harris;acu_harris];
         ACU_RCSS = [ACU_RCSS;acu_RCSS];
         ACU_ECSS = [ACU_ECSS;acu_ECSS];
         ACU_final = [ACU_final;acu_final];
-        
         TPR_harris = [TPR_harris;tpr_harris];
         TPR_RCSS = [TPR_RCSS;tpr_RCSS];
         TPR_ECSS = [TPR_ECSS;tpr_ECSS];
@@ -515,20 +497,6 @@ if img_num > 0 %有满足条件的图像
         FPR_RCSS = [FPR_RCSS;fpr_RCSS];
         FPR_ECSS = [FPR_ECSS;fpr_ECSS];
         FPR_final = [FPR_final;fpr_final];
-        
-        TP_harris = [TP_harris;tp_harris];
-        TP_RCSS = [TP_RCSS;tp_RCSS];
-        TP_ECSS = [TP_ECSS;tp_ECSS];
-        TP_final = [TP_final;tp_final];
-        FP_harris = [FP_harris;fp_harris];
-        FP_RCSS = [FP_RCSS;fp_RCSS];
-        FP_ECSS = [FP_ECSS;fp_ECSS];
-        FP_final = [FP_final;fp_final];
-        Ground_truth_num = [Ground_truth_num;ground_truth_num];
-        Corner_harris_num = [Corner_harris_num; corner_count_harris];
-        Corner_RCSS_num = [Corner_RCSS_num; corner_count_RCSS];
-        Corner_ECSS_num = [Corner_ECSS_num; corner_count_ECSS];
-        Corner_final_num = [Corner_final_num; corner_count_final]; 
     end
 end
 %% LE - Localization error
@@ -539,14 +507,6 @@ writetable(LE,'./experiments/result/LE.xlsx');
 ACU = table(Image_name,ACU_harris,ACU_RCSS,ACU_ECSS,ACU_final);
 writetable(ACU,'./experiments/result/ACU.xlsx');
 
-%% TP
-TP = table(Image_name,TP_harris,TP_RCSS,TP_ECSS,TP_final);
-writetable(TP,'./experiments/result/TP.xlsx');
-
-%% FP
-FP = table(Image_name,FP_harris,FP_RCSS,FP_ECSS,FP_final);
-writetable(FP,'./experiments/result/FP.xlsx');
-
 %% TPR
 TPR = table(Image_name,TPR_harris,TPR_RCSS,TPR_ECSS,TPR_final);
 writetable(TPR,'./experiments/result/TPR.xlsx');
@@ -554,11 +514,7 @@ writetable(TPR,'./experiments/result/TPR.xlsx');
 %% FPR
 FPR = table(Image_name,FPR_harris,FPR_RCSS,FPR_ECSS,FPR_final);
 writetable(FPR,'./experiments/result/FPR.xlsx');
-% writetable(T,filename,'Sheet',1,'Range','D1')
 
-%% All in one
-All = table(Image_name,Ground_truth_num,Corner_harris_num,Corner_RCSS_num,Corner_ECSS_num,Corner_final_num,TP_harris,TP_RCSS,TP_ECSS,TP_final,FP_harris,FP_RCSS,FP_ECSS,FP_final,LE_harris,LE_RCSS,LE_ECSS,LE_final,ACU_harris,ACU_RCSS,ACU_ECSS,ACU_final);
-writetable(All,'./experiments/result/ALL.xlsx');
 %% Receiver Operating Characteristic
 
 
